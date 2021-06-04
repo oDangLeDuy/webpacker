@@ -1,5 +1,6 @@
 require "open3"
 require "digest/sha1"
+require_relative "support/action_view_backport.rb"
 
 class Webpacker::Compiler
   # Additional paths that test compiler needs to watch

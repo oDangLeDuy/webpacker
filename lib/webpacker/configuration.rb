@@ -1,6 +1,7 @@
 require "yaml"
 require "active_support/core_ext/hash/keys"
 require "active_support/core_ext/hash/indifferent_access"
+require_relative "support/string_backport.rb"
 
 class Webpacker::Configuration
   attr_reader :root_path, :config_path, :env
@@ -98,7 +99,7 @@ class Webpacker::Configuration
       rescue ArgumentError
         YAML.load_file(config_path.to_s)
       end
-      config[env].deep_symbolize_keys
+      backport_deep_symbolize_keys(config[env])
     rescue Errno::ENOENT => e
       raise "Webpacker configuration file not found #{config_path}. " \
             "Please run rails webpacker:install " \
@@ -124,5 +125,22 @@ class Webpacker::Configuration
 
     def globbed_path_with_extensions(path)
       "#{path}/**/*{#{extensions.join(',')}}"
+    end
+
+    def backport_deep_symbolize_keys(object)
+      backport_deep_transform_keys(object) { |key| key.to_sym rescue key }
+    end
+
+    def backport_deep_transform_keys(object, &block)
+      case object
+      when Hash
+        object.each_with_object(Hash.new) do |(key, value), result|
+          result[yield(key)] = backport_deep_transform_keys(value, &block)
+        end
+      when Array
+        object.map { |e| backport_deep_transform_keys(e, &block) }
+      else
+        object
+      end
     end
 end

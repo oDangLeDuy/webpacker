@@ -104,7 +104,7 @@ Add Rake task to compile assets in production (`rake my_engine:webpacker:compile
 ```ruby
 def ensure_log_goes_to_stdout
   old_logger = Webpacker.logger
-  Webpacker.logger = ActiveSupport::Logger.new(STDOUT)
+  Webpacker.logger = ActiveSupport::BufferedLogger.new(STDOUT)
   yield
 ensure
   Webpacker.logger = old_logger

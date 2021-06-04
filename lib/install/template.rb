@@ -34,7 +34,8 @@ if File.exists?(".gitignore")
   end
 end
 
-if Webpacker::VERSION.match?(/^[0-9]+\.[0-9]+\.[0-9]+$/)
+webpacker_version = Webpacker::VERSION.match(/^[0-9]+\.[0-9]+\.[0-9]+$/)
+if webpacker_version
   say "Installing all JavaScript dependencies [#{Webpacker::VERSION}]"
   run "yarn add @rails/webpacker@#{Webpacker::VERSION}"
 else
